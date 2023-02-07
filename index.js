@@ -1,60 +1,40 @@
-import { spawn, exec, execSync } from "node:child_process";
+import { execSync } from "node:child_process";
+import { existsSync, rmdirSync, unlinkSync } from "node:fs";
 
-// const ls = spawn("ls", ["-lh", "/usr"]);
-// ffmpeg -i video.mp4 -f mp3 -ab 192000 -vn music.mp3
+(async () => {
 
-function getYouTube() {
+    const output = 'output'
+    const dirOut = `${output}/music`
+    const videoName = 'video.mp4'
+    const audioName = 'music.mp3'
+
+    // deleta o diretorio music dentro de output
+    if (existsSync(dirOut)) {
+        await rmdirSync(dirOut, { recursive: true })
+    }
+
+    // deleta os arquivos mp4 e mp3
+    if (existsSync(videoName)) {
+        await unlinkSync(videoName)
+    }
+    if (existsSync(audioName)) {
+        await unlinkSync(audioName)
+    }
     
-    const ls = spawn("python3", ["youtube.py"]);
-    
-    ls.stdout.on("data", (data) => {
-      console.log(`stdout: ${data}`);
-    });
-    
-    ls.stderr.on("data", (data) => {
-      console.error(`stderr: ${data}`);
-    });
-    
-    ls.on("close", (code) => {
-      console.log(`child process exited with code ${code}`);
-    });
+    // faz o download video youtube
+    await execSync("python youtube.py");
 
-}
+    // extrai o audio do video
+    await execSync(`ffmpeg -i ${videoName} -f mp3 -ab 192000 -vn ${audioName}`);
 
-function extractAudio() {
-    
-    const ls = spawn("ffmpeg", [
-      "-i",
-      "video.mp4",
-      "-f",
-      "mp3",
-      "-ab",
-      "192000",
-      "-vn",
-      "music.mp3",
-    ]);
+    // faz a separação das faixas de audio
+    // -p spleeter:4stems
+    // -p spleeter:5stems
+    await execSync(`spleeter separate -o ${output} -p spleeter:2stems ${audioName}`);
 
-    ls.stdout.on("data", (data) => {
-      console.log(`stdout: ${data}`);
-    });
+    // converte wav para mp3
+    await execSync(`ffmpeg -i ${dirOut}/accompaniment.wav -vn -ar 44100 -ac 2 -b:a 192k ${dirOut}/accompaniment.mp3`);
+    await execSync(`ffmpeg -i ${dirOut}/vocals.wav -vn -ar 44100 -ac 2 -b:a 192k ${dirOut}/vocals.mp3`);
 
-    ls.stderr.on("data", (data) => {
-      console.error(`stderr: ${data}`);
-    });
 
-    ls.on("close", (code) => {
-      console.log(`child process exited with code ${code}`);
-    });
-
-}
-
-async function removeVoiceAudio() {
-    
-    // await execSync('ffmpeg -i music.mp3 -af pan="stereo|c0=c0|c1=-1*c1" -ac 1 musicX.mp3');
-    // await execSync("spleeter separate -i music.mp3 -p spleeter:2stems -o ./output");
-
-}
-
-// getYouTube()
-// extractAudio()
-// removeVoiceAudio()
+})()

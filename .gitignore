@@ -1,0 +1,7 @@
+vscode
+pretrained_models
+output
+*.mp3
+*.wav
+*.mp4
+.package-lock.json
