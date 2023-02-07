@@ -11,5 +11,5 @@ Mescla NodeJs + Python para download do video, extrair o audio e separar vozes d
 ```pip install pytube```
 
 ## Iniciar
-- Dentro do arquivo youtube.py substituir "inserir_url"
+- Dentro do arquivo youtube.py substituir ```inserir_url```
 - Dentro do diretório root executar ```npm start```
