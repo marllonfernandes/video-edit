@@ -2,10 +2,12 @@
 Mescla NodeJs + Python para download do video, extrair o audio e separar vozes dos instrumentos  
 
 ## Pré requisitos  
-- Python 3.9.2
+- Python 3.8.20
 - NodeJs v18.12.1
 - FFMPEG 
 - Spleeter    
+- demucs
+- sox
 
 ## Dependencias Python
 ```pip install pytube```

@@ -7,3 +7,8 @@ output
 .package-lock.json
 node_modules
 *.py
+separated
+data
+*-base.js
+.DS_Store
+.env
